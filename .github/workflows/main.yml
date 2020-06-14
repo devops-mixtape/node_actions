@@ -25,7 +25,7 @@ jobs:
     - name: Install dependencies
       run: npm ci
     - name: Install cross-env globally
-      run :npm install -g cross-env
+      run: npm install -g cross-env
 
       env:
         CI: true
