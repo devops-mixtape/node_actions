@@ -74,8 +74,7 @@ jobs:
 
     steps:
     - name: Download task definition
-       run: |
-         aws ecs describe-task-definition --task-definition "${{secrets.ECS_TASK_DEFINITION_FAMILY}}" --query taskDefinition > task-definition.json
+       run: aws ecs describe-task-definition --task-definition "${{secrets.ECS_TASK_DEFINITION_FAMILY}}" --query taskDefinition > task-definition.json
     - name: Deploy to Amazon ECS
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
