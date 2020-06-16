@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -33,6 +32,9 @@ jobs:
         CI: true
 
   build:
+    runs-on: ubuntu-latest
+    needs: test
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -56,7 +58,12 @@ jobs:
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
   deploy:
-    needs: build
+    runs-on: ubuntu-latest
+    needs: [test, build]
+
+     - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{secrets.ECS_TASK_DEFINITION_FAMILY}} --query taskDefinition > task-definition.json
     - name: Deploy to Amazon ECS
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
@@ -64,6 +71,3 @@ jobs:
         service: ${{ secrets.ECR_SERVICE_NAME }}
         cluster: ${{ secrets.ECR_CLUSTER_NAME }}
         wait-for-service-stability: true
-         - name: Download task definition
-            run: |
-              aws ecs describe-task-definition --task-definition my-task-definition-family --query taskDefinition > task-definition.json
