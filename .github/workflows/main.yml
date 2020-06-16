@@ -74,7 +74,9 @@ jobs:
 
     steps:
     - name: Download task definition
-       run: aws ecs describe-task-definition --task-definition "${{secrets.ECS_TASK_DEFINITION_FAMILY}}" --query taskDefinition > task-definition.json
+       run: aws ecs describe-task-definition \
+              --task-definition ${{secrets.ECS_TASK_DEFINITION_FAMILY }} \
+              --query taskDefinition > task-definition.json
     - name: Deploy to Amazon ECS
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
@@ -82,18 +84,18 @@ jobs:
         service: ${{ secrets.ECR_SERVICE_NAME }}
         cluster: ${{ secrets.ECR_CLUSTER_NAME }}
         wait-for-service-stability: true
-        - name: Fill in the new image ID in the Amazon ECS task definition
-          id: task-def
-          uses: aws-actions/amazon-ecs-render-task-definition@v1
-          with:
-            task-definition: task-definition.json
-            container-name: my-container
-            image: ${{ steps.build-image.outputs.image }}
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: task-definition.json
+        container-name: my-container
+        image: ${{ steps.build-image.outputs.image }}
 
-        - name: Deploy Amazon ECS task definition
-          uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-          with:
-            task-definition: ${{ steps.task-def.outputs.task-definition }}
-            service: my-service
-            cluster: my-cluster
-            wait-for-service-stability: true
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: my-service
+        cluster: my-cluster
+        wait-for-service-stability: true
