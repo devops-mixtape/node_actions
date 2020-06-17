@@ -27,7 +27,7 @@ jobs:
 
       env:
         CI: true
-    - name: Run tests
+    - name: Run run tests
       run: npm test
 
   lint:
@@ -53,5 +53,5 @@ jobs:
 
       env:
         CI: true
-    - name: Run tests
-      run: npm lint
+    - name: Run linter
+      run: npm run lint
