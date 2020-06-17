@@ -1,5 +1,3 @@
-'use strict';
-
 const express = require('express');
 
 // Constants
@@ -12,5 +10,4 @@ app.get('/', (req, res) => {
   res.send("They say the mountains hold many secrets. The greatest among them is this: 'I am a fake mountain.'");
 });
 
-console.log(`Running on http://${HOST}:${PORT}`);
 module.exports = app.listen(PORT, HOST);
