@@ -9,7 +9,7 @@ jobs:
   build_deploy:
     runs-on: ubuntu-latest
     env:
-      ECR_IMAGE_NAME: node_actions
+      ECR_IMAGE_NAME: ${{ secrets.CONTAINER_IMAGE_NAME }}
 
     steps:
     - uses: actions/checkout@v2
@@ -33,7 +33,7 @@ jobs:
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_IMAGE_NAME:$IMAGE_TAG"
     - name: Download task definition
       run: |
-        aws ecs describe-task-definition --task-definition node_actions --query taskDefinition > task-definition.json
+        aws ecs describe-task-definition --task-definition ${{ secrets.CONTAINER_IMAGE_NAME }} --query taskDefinition > task-definition.json
     - name: Deploy to Amazon ECS
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
@@ -46,12 +46,12 @@ jobs:
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: task-definition.json
-        container-name: node_actions
+        container-name: ${{ secrets.CONTAINER_IMAGE_NAME }}
         image: ${{ steps.build-image.outputs.image }}
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: node_actions
-        cluster: node_actions
+        service: ${{ secrets.ECR_SERVICE_NAME }}
+        cluster: ${{ secrets.ECR_CLUSTER_NAME }}
         wait-for-service-stability: true
